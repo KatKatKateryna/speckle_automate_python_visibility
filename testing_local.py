@@ -1,7 +1,4 @@
 
-
-from copy import copy
-import json
 import math
 from typing import List
 from specklepy.api.operations import receive, send
