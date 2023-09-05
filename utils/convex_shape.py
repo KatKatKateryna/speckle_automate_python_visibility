@@ -3,13 +3,8 @@ import math
 from typing import List, Union
 import json
 import numpy as np
-from shapely.geometry import MultiLineString
-from shapely.ops import unary_union, polygonize
-from scipy.spatial import Delaunay
-from collections import Counter
-import itertools
 
-from specklepy.objects.geometry import Pointcloud, Polyline, Point, Mesh, Line
+from specklepy.objects.geometry import Pointcloud
 
 from utils.utils_other import COLOR_VISIBILITY
 from utils.vectors import createPlane, normalize 
