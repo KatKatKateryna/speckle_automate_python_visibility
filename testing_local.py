@@ -124,11 +124,13 @@ def run(client, server_transport, keyword):
 
             color = (255<<24) + (r<<16) + (g<<8) + b # argb
             colors.append(color)
-        if len(points)==0 or len(colors)==0: return             
-        cloud = [ Pointcloud(points = points, colors = colors )]
+        if len(points)==0 or len(colors)==0: return  
 
         visibility = (len(vectors) - len(cleanPts))/len(vectors) * 100
-        print(f"Visible sky: {visibility}%")
+        print(f"Visible sky: {visibility * 100}%")      
+
+        cloud = [ Pointcloud(points = points, colors = colors, visibility = visibility )]
+
     
     if onlyIllustrate is True:
         visibleObj = Collection(elements = lines, units = "m", name = "Context", collectionType = "VisibilityAnalysis")
