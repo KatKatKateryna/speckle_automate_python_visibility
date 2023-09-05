@@ -18,14 +18,6 @@ from utils.utils_visibility import getAllPlanes, projectToPolygon, rotate_vector
 HALF_VIEW_DEGREES = 70
 STEP_DEGREES = 5
 
-#KEYWORD = "window"
-#server_url = "https://latest.speckle.dev/" #"https://speckle.xyz/" # project_data.speckle_server_url
-#project_id = "04a609b47c" #"4ea6a03993"# Kate's tests #"17b0b76d13" #project_data.project_id
-#account = get_local_accounts()[0]
-#client = SpeckleClient(server_url)
-#client.authenticate_with_token(account.token)
-#server_transport = ServerTransport(project_id, client)
-
 def run(client, server_transport, keyword):
     
     onlyIllustrate = False 
@@ -157,3 +149,11 @@ def run(client, server_transport, keyword):
                 source_application="Python",
             )
 
+
+#KEYWORD = "window"
+#server_url = "https://latest.speckle.dev/" #"https://speckle.xyz/" # project_data.speckle_server_url
+#project_id = "04a609b47c" #"4ea6a03993"# Kate's tests #"17b0b76d13" #project_data.project_id
+#account = get_local_accounts()[0]
+#client = SpeckleClient(server_url)
+#client.authenticate_with_token(account.token)
+#server_transport = ServerTransport(project_id, client)
