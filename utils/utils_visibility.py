@@ -1,22 +1,16 @@
-
-
 import math
 import random
 from typing import List
-from scipy.linalg import expm, norm
-
 import numpy as np
 from numpy import cross, eye, dot
+from numpy.linalg import norm
 from operator import add, sub
 from specklepy.objects.geometry import Mesh, Point
-
-from utils.convex_shape import remapPt
 from utils.vectors import createPlane, normalize 
-
-#def project_to_plane_on_z(point: List, plane: dict):
-#    d = dot(plane["normal"], plane["origin"])
-#    z_value_on_plane = (d - (plane["normal"][0] * point[0]) - (plane["normal"][1] * point[1])) / plane["normal"][2] 
-#    return z_value_on_plane
+from utils.convex_shape import remapPt
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
+from utils.scipy_replacement import expm
 
 def LinePlaneCollision(planeNormal, planePoint, rayDirection, rayPoint, epsilon=1e-6):
     # https://gist.github.com/TimSC/8c25ca941d614bf48ebba6b473747d72
