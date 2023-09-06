@@ -154,7 +154,7 @@ def run(client, server_transport, keyword):
                 source_application="Python",
             )
 
-
+r'''
 # FOR DEBUGGING LOCALLY run this file
 from specklepy.transports.server import ServerTransport
 from specklepy.api.client import SpeckleClient
@@ -168,4 +168,4 @@ client = SpeckleClient(server_url)
 client.authenticate_with_token(account.token)
 server_transport = ServerTransport(project_id, client)
 run(client, server_transport, KEYWORD) 
-
+''' 
