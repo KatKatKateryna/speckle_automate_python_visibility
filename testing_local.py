@@ -16,21 +16,21 @@ from utils.utils_other import RESULT_BRANCH, cleanPtsList, findMeshesNearby, sor
 from utils.utils_visibility import getAllPlanes, projectToPolygon, rotate_vector, expandPtsList
 
 HALF_VIEW_DEGREES = 70
-STEP_DEGREES = 5
+STEP_DEGREES = 1
+STEP_DEGREES_EXTENSION = 10
 
 def run(client, server_transport, keyword):
     
     onlyIllustrate = False  
 
     project_id = server_transport.stream_id
-    pt_origin = [0, 0, 50]
-    dir = [1,-1,-0.5]
 
     comments = get_comments(
         client,
         project_id,
     )
     pt_origin = None
+    dir = None
     commitId = None
     for item in comments["comments"]["items"]:
         if keyword.lower() in item["rawText"].lower():
@@ -89,15 +89,16 @@ def run(client, server_transport, keyword):
         ### expand number of pts around filtered rays 
         expandedPts2 = []
         mesh_nearby = findMeshesNearby(cleanPts)
-        expandedPts2, usedVectors2 = expandPtsList(pt_origin, cleanPts, {}, STEP_DEGREES*1.5, all_geom, mesh_nearby)
-        #expandedPts2 = cleanPtsList(pt_origin, expandedPts2, usedVectors2)
+        expandedPts21, usedVectors2 = expandPtsList(pt_origin, cleanPts, {}, STEP_DEGREES_EXTENSION, all_geom, mesh_nearby)
+        expandedPts2 = cleanPtsList(pt_origin, expandedPts21, usedVectors2)
 
         ### expand number of pts around filtered rays 
         expandedPts3 = []
-        #clean_extended_pts = cleanPts + expandedPts2
-        #mesh_nearby = findMeshesNearby(clean_extended_pts)
-        #expandedPts3, usedVectors3 = expandPtsList(pt_origin, clean_extended_pts, {}, STEP_DEGREES, all_geom, mesh_nearby)
-        
+        clean_extended_pts = cleanPts + expandedPts2
+        mesh_nearby = findMeshesNearby(clean_extended_pts)
+        expandedPts31, usedVectors3 = expandPtsList(pt_origin, clean_extended_pts, {}, STEP_DEGREES_EXTENSION/5, all_geom, mesh_nearby)
+        expandedPts3 = cleanPtsList(pt_origin, expandedPts31, usedVectors3)
+
         ### expand number of pts around filtered rays 
         expandedPts4 = []
         #clean_extended_pts = clean_extended_pts + expandedPts3

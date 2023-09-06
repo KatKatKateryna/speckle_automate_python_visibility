@@ -61,11 +61,17 @@ def rotate_vector(pt_origin, vector, half_angle_degrees=70, step = 10):
             vectors.append( np.array( list( map(add, pt_origin, v) )) ) 
             continue 
         
-        coeff = 1- math.pow( (count+1 - c) / (count+1), 100)
+        #coeff = 1- math.pow( (count+1 - c) / (count+1), 10000)
+        angle = (math.pi*0.5)*c/count
+        cos = math.cos( angle - math.pi*0.3)
+        c2 = math.pow( cos , 0.9)
+        coeff = c2
+        if coeff ==0: coeff = 1
         step2 = int( coeff * (count+1 - c) * step ) 
         if step2 == 0: step2 = 1
 
-        for a in range(0,360,step2): 
+        a = random.randint(0,40)
+        for a in range(0+a,360+a,step2): 
             theta = a*math.pi / 180 
             M0 = M(vector, theta)
             newDir = dot(M0,v)
@@ -96,7 +102,7 @@ def getAllPlanes(mesh: Mesh) -> List[list]:
             meshList.extend(getAllPlanes(m))
     return meshList
     
-def projectToPolygon(point: List[float], vectors: List[List[float]], usedVectors: dict, m, index):
+def projectToPolygon(point: List[float], vectors: List[List[float]], usedVectors: dict, m, index, vectors_indices = None):
     allIntersections = []
 
     #meshes = getAllPlanes(mesh)
@@ -138,14 +144,22 @@ def projectToPolygon(point: List[float], vectors: List[List[float]], usedVectors
 
             pt_intersect = Point.from_list([collision[0], collision[1], collision[2]])
             pt_intersect.vectorId = i
+            if vectors_indices: pt_intersect.vectorId = vectors_indices[i]
             pt_intersect.meshId = index 
             pt_intersect.distance = np.sqrt(np.sum(( np.array(point) -collision)**2, axis=0))
 
             allIntersections.append(pt_intersect)
 
-            try: val = usedVectors[i] + 1
+            try: 
+                if vectors_indices: 
+                    val = usedVectors[vectors_indices[i]] + 1
+                else:
+                    val = usedVectors[i] + 1
             except: val = 1
-            usedVectors.update({i:val})
+            if vectors_indices: 
+                usedVectors.update({vectors_indices[i]:val})
+            else:
+                usedVectors.update({i:val})
 
     return allIntersections, usedVectors
 
@@ -161,8 +175,9 @@ def expandPtsList(pt_origin, all_pts, usedVectors, step_original, all_geom, mesh
     
     half_angle = np.deg2rad(half_angle_degrees)
 
+    vectors = []
+    vectors_mesh_ids = []
     for i, ptSpeckle in enumerate(all_pts):
-        vectors = []
         pt = [ptSpeckle.x, ptSpeckle.y, ptSpeckle.z]
         vector =  np.array( list(map(sub, pt, pt_origin)) ) # direction
         # xy plane
@@ -178,18 +193,21 @@ def expandPtsList(pt_origin, all_pts, usedVectors, step_original, all_geom, mesh
             M0 = M(axis, theta)
             newDir = dot(M0,v)
             vectors.append( np.array( list( map(add, pt_origin, newDir) )) ) 
+            vectors_mesh_ids.append(ptSpeckle.meshId)
     
-        # project rays 
-        count = 0
-        for mesh in all_geom:
-            if count in ([ptSpeckle.meshId] + mesh_nearby[i]):  
-                pts, usedVectorsUpd = projectToPolygon(pt_origin, vectors, {}, mesh, count) #Mesh.create(vertices = [0,0,0,5,0,0,5,19,0,0,14,0], faces=[4,0,1,2,3]))
-                new_pts.extend( pts )
-                for k, v in usedVectorsUpd.items():
-                    try: val = usedVectors[k] + 1
-                    except: val = 1
-                    usedVectors.update({k:val})
-            count +=1
+    # project rays 
+    count = 0
+    for mesh in all_geom:
+        vectors_to_mesh = [ v for x,v in enumerate(vectors) if vectors_mesh_ids[x]==count ]
+        vectors_to_mesh_enum = [ x for x,v in enumerate(vectors) if vectors_mesh_ids[x]==count ]
+        #if count in ([ptSpeckle.meshId] + mesh_nearby[i]):  
+        pts, usedVectorsUpd = projectToPolygon(pt_origin, vectors_to_mesh, {}, mesh, count, vectors_to_mesh_enum) #Mesh.create(vertices = [0,0,0,5,0,0,5,19,0,0,14,0], faces=[4,0,1,2,3]))
+        new_pts.extend( pts )
+        for k, v in usedVectorsUpd.items():
+            try: val = usedVectors[k] + 1
+            except: val = 1
+            usedVectors.update({k:val})
+        count +=1
         #break
     return new_pts, usedVectors
 
