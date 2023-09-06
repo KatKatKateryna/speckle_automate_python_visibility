@@ -187,7 +187,7 @@ def expandPtsList(pt_origin, all_pts, usedVectors, step_original, all_geom, mesh
         v = [x,y,vector[2]]
         axis = vector
         
-        ran = random.randint(0,10)
+        ran = random.randint(0,60)
         for a in range(ran,360+ran,60): 
             theta = a*math.pi / 180 
             M0 = M(axis, theta)

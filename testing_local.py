@@ -96,7 +96,7 @@ def run(client, server_transport, keyword):
         expandedPts3 = []
         clean_extended_pts = cleanPts + expandedPts2
         mesh_nearby = findMeshesNearby(clean_extended_pts)
-        expandedPts31, usedVectors3 = expandPtsList(pt_origin, clean_extended_pts, {}, STEP_DEGREES_EXTENSION/5, all_geom, mesh_nearby)
+        expandedPts31, usedVectors3 = expandPtsList(pt_origin, clean_extended_pts, {}, STEP_DEGREES_EXTENSION/3, all_geom, mesh_nearby)
         expandedPts3 = cleanPtsList(pt_origin, expandedPts31, usedVectors3)
 
         ### expand number of pts around filtered rays 
@@ -117,7 +117,7 @@ def run(client, server_transport, keyword):
                 distances.append(p.distance)
 
         for d in distances:
-            fraction = math.pow( (max(distances)-d)/max(distances), 0.4 )
+            fraction = math.pow( (max(distances)-d)/max(distances), 0.9 )
             # https://matplotlib.org/stable/tutorials/colors/colormaps.html
             cmap = mpl.colormaps['jet']
             mapColor = cmap(fraction)
