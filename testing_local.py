@@ -85,23 +85,24 @@ def run(client, server_transport, keyword):
                 count +=1
 
         cleanPts = cleanPtsList(pt_origin, all_pts, usedVectors)
-        mesh_nearby = findMeshesNearby(cleanPts)
 
         ### expand number of pts around filtered rays 
         expandedPts2 = []
-        expandedPts2, usedVectors2 = expandPtsList(pt_origin, cleanPts, {}, STEP_DEGREES, all_geom, mesh_nearby)
+        mesh_nearby = findMeshesNearby(cleanPts)
+        expandedPts2, usedVectors2 = expandPtsList(pt_origin, cleanPts, {}, STEP_DEGREES*1.5, all_geom, mesh_nearby)
+        #expandedPts2 = cleanPtsList(pt_origin, expandedPts2, usedVectors2)
 
         ### expand number of pts around filtered rays 
         expandedPts3 = []
-        clean_extended_pts = cleanPts + expandedPts2
-        mesh_nearby = findMeshesNearby(clean_extended_pts)
-        expandedPts3, usedVectors3 = expandPtsList(pt_origin, clean_extended_pts, {}, STEP_DEGREES/2.5, all_geom, mesh_nearby)
+        #clean_extended_pts = cleanPts + expandedPts2
+        #mesh_nearby = findMeshesNearby(clean_extended_pts)
+        #expandedPts3, usedVectors3 = expandPtsList(pt_origin, clean_extended_pts, {}, STEP_DEGREES, all_geom, mesh_nearby)
         
         ### expand number of pts around filtered rays 
         expandedPts4 = []
-        clean_extended_pts = clean_extended_pts + expandedPts3
-        mesh_nearby = findMeshesNearby(clean_extended_pts)
-        expandedPts4, usedVectors4 = expandPtsList(pt_origin, clean_extended_pts, {}, STEP_DEGREES/5, all_geom, mesh_nearby)
+        #clean_extended_pts = clean_extended_pts + expandedPts3
+        #mesh_nearby = findMeshesNearby(clean_extended_pts)
+        #expandedPts4, usedVectors4 = expandPtsList(pt_origin, clean_extended_pts, {}, STEP_DEGREES/5, all_geom, mesh_nearby)
 
         sortedPts = sortPtsByMesh(cleanPts + expandedPts2 + expandedPts3 + expandedPts4)
 
@@ -127,7 +128,7 @@ def run(client, server_transport, keyword):
             colors.append(color)
         if len(points)==0 or len(colors)==0: return  
 
-        visibility = (len(vectors) - len(cleanPts))/len(vectors) * 100
+        visibility = (len(vectors) - len(cleanPts))/len(vectors) 
         print(f"Visible sky: {visibility * 100}%")      
 
         cloud = [ Pointcloud(points = points, colors = colors, visibility = visibility )]
@@ -152,8 +153,8 @@ def run(client, server_transport, keyword):
                 source_application="Python",
             )
 
-r'''
-# FOE DEBUGGING LOCALLY run this file
+
+# FOR DEBUGGING LOCALLY run this file
 from specklepy.transports.server import ServerTransport
 from specklepy.api.client import SpeckleClient
 from specklepy.api.credentials import get_local_accounts
@@ -166,4 +167,4 @@ client = SpeckleClient(server_url)
 client.authenticate_with_token(account.token)
 server_transport = ServerTransport(project_id, client)
 run(client, server_transport, KEYWORD) 
-'''
+

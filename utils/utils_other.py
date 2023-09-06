@@ -3,12 +3,36 @@ from copy import copy
 from typing import List
 
 import numpy as np
-from specklepy.objects.geometry import Point
+from specklepy.objects.geometry import Point, Base
 
 RESULT_BRANCH = "automate"
 COLOR_ROAD = (255<<24) + (50<<16) + (50<<8) + 50 # argb
 COLOR_BLD = (255<<24) + (200<<16) + (200<<8) + 200 # argb
 COLOR_VISIBILITY = (255<<24) + (255<<16) + (10<<8) + 10 # argb
+
+def getScale(mesh: Base)-> float:
+    units = mesh.units
+    try:
+        unit_scale = {
+        "meters": 1.0,
+        "centimeters": 0.01,
+        "millimeters": 0.001,
+        "inches": 0.0254,
+        "feet": 0.3048,
+        "kilometers": 1000.0,
+        "mm": 0.001,
+        "cm": 0.01,
+        "m": 1.0,
+        "km": 1000.0,
+        "in": 0.0254,
+        "ft": 0.3048,
+        "yd": 0.9144,
+        "mi": 1609.340,
+        }
+        if units is not None and isinstance(units, str) and units.lower() in unit_scale.keys():
+            return unit_scale[units]
+        return 1.0
+    except: return 1.0
 
 def findMeshesNearby(cleanPts: List[Point]) -> List[Point]:
     # add indices of neighbouring meshes

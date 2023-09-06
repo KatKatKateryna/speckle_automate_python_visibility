@@ -6,6 +6,7 @@ from numpy import cross, eye, dot
 from numpy.linalg import norm
 from operator import add, sub
 from specklepy.objects.geometry import Mesh, Point
+from utils.utils_other import getScale
 from utils.vectors import createPlane, normalize 
 from utils.convex_shape import remapPt
 
@@ -74,6 +75,7 @@ def rotate_vector(pt_origin, vector, half_angle_degrees=70, step = 10):
 
 def getAllPlanes(mesh: Mesh) -> List[list]:
     meshList = []
+    s = getScale(mesh)
     if isinstance(mesh, Mesh):
         i = 0
         fs = mesh.faces
@@ -83,7 +85,7 @@ def getAllPlanes(mesh: Mesh) -> List[list]:
             pt_list = []
             for x in range(i+1, i+fs[i]+1):
                 ind = int(fs[x])
-                pt_list.append( [mesh.vertices[3*ind], mesh.vertices[3*ind+1], mesh.vertices[3*ind+2]] )
+                pt_list.append( [s*mesh.vertices[3*ind], s*mesh.vertices[3*ind+1], s*mesh.vertices[3*ind+2]] )
             #pt1 = [mesh.vertices[3*fs[i+1]], mesh.vertices[3*fs[i+1]+1], mesh.vertices[3*fs[i+1]+2]]
             #pt2 = [mesh.vertices[3*fs[i+2]], mesh.vertices[3*fs[i+2]+1], mesh.vertices[3*fs[i+2]+2]]
             #pt3 = [mesh.vertices[3*fs[i+3]], mesh.vertices[3*fs[i+3]+1], mesh.vertices[3*fs[i+3]+2]]
@@ -152,10 +154,11 @@ def expandPtsList(pt_origin, all_pts, usedVectors, step_original, all_geom, mesh
 
     new_pts = []
     #
-    half_angle_degrees = step_original/2
+    half_angle_degrees = step_original#*1.5
     if half_angle_degrees ==0: half_angle_degrees = 1
-    if half_angle_degrees == step_original:
-        return
+    #if half_angle_degrees == step_original: # was valid without remapping angles
+    #    return new_pts, usedVectors
+    
     half_angle = np.deg2rad(half_angle_degrees)
 
     for i, ptSpeckle in enumerate(all_pts):
@@ -180,8 +183,12 @@ def expandPtsList(pt_origin, all_pts, usedVectors, step_original, all_geom, mesh
         count = 0
         for mesh in all_geom:
             if count in ([ptSpeckle.meshId] + mesh_nearby[i]):  
-                pts, usedVectors = projectToPolygon(pt_origin, vectors, {}, mesh, count) #Mesh.create(vertices = [0,0,0,5,0,0,5,19,0,0,14,0], faces=[4,0,1,2,3]))
+                pts, usedVectorsUpd = projectToPolygon(pt_origin, vectors, {}, mesh, count) #Mesh.create(vertices = [0,0,0,5,0,0,5,19,0,0,14,0], faces=[4,0,1,2,3]))
                 new_pts.extend( pts )
+                for k, v in usedVectorsUpd.items():
+                    try: val = usedVectors[k] + 1
+                    except: val = 1
+                    usedVectors.update({k:val})
             count +=1
         #break
     return new_pts, usedVectors

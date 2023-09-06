@@ -19,10 +19,14 @@ def iterateBase(base: Base) -> Iterable[Base]:
                 return meshes
         except: pass
 
-        for name in base.get_member_names():
+        all_names = base.get_member_names()
+        if "displayValue" in all_names: all_names = ["displayValue"]
+        elif isinstance(base, Collection): all_names = ["elements"]
+
+        for name in all_names:
             try:
 
-                if name.endswith("definition") or name == "units" or name == "speckle_type":
+                if name.endswith("definition") or name == "parameters" or name == "transform" or name == "units" or name == "speckle_type":
                     continue
                 if isinstance(base[name], Mesh): 
                     meshes.append(meshes)
