@@ -1,5 +1,6 @@
 from typing import Iterable, List
 from specklepy.objects import Base
+from specklepy.objects.other import Collection
 from specklepy.objects.geometry import Mesh
 
 
@@ -12,8 +13,15 @@ def flatten_base(base: Base) -> Iterable[Base]:
 def iterateBase(base: Base) -> Iterable[Base]:
     meshes = []
     if isinstance(base, Base):
+        
+        try: # ignore roads 
+            if isinstance(base, Collection) and (base.collectionType=="RoadMeshesLayer" or base.collectionType=="RoadsLayer"):
+                return meshes
+        except: pass
+
         for name in base.get_member_names():
             try:
+
                 if name.endswith("definition") or name == "units" or name == "speckle_type":
                     continue
                 if isinstance(base[name], Mesh): 

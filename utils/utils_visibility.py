@@ -8,9 +8,10 @@ from operator import add, sub
 from specklepy.objects.geometry import Mesh, Point
 from utils.vectors import createPlane, normalize 
 from utils.convex_shape import remapPt
-from shapely.geometry import Point
-from shapely.geometry.polygon import Polygon
+
 from utils.scipy_replacement import expm
+from shapely.geometry import Point as Point_shp
+from shapely.geometry.polygon import Polygon as Polygon_shp
 
 def LinePlaneCollision(planeNormal, planePoint, rayDirection, rayPoint, epsilon=1e-6):
     # https://gist.github.com/TimSC/8c25ca941d614bf48ebba6b473747d72
@@ -25,15 +26,13 @@ def LinePlaneCollision(planeNormal, planePoint, rayDirection, rayPoint, epsilon=
     return Psi
 
 def containsPoint(pt: np.array, mesh: List):
-    from shapely.geometry import Point
-    from shapely.geometry.polygon import Polygon
 
     plane3d = createPlane(*mesh[:3])
     vert2d = remapPt(pt, True, plane3d)
     mesh2d = [ remapPt(m, True, plane3d) for m in mesh ]
 
-    point = Point(vert2d[0], vert2d[1])
-    polygon = Polygon([ (m[0], m[1]) for m in mesh2d ])
+    point = Point_shp(vert2d[0], vert2d[1])
+    polygon = Polygon_shp([ (m[0], m[1]) for m in mesh2d ])
     result = polygon.contains(point)
     return result
 

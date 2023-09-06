@@ -20,7 +20,7 @@ STEP_DEGREES = 5
 
 def run(client, server_transport, keyword):
     
-    onlyIllustrate = False 
+    onlyIllustrate = False  
 
     project_id = server_transport.stream_id
     pt_origin = [0, 0, 50]
@@ -41,7 +41,7 @@ def run(client, server_transport, keyword):
 
             pos: List[float] = viewerState["ui"]["camera"]["position"]
             target: List[float] = viewerState["ui"]["camera"]["target"]
-            pt_origin = target
+
             dir = list( map(sub, pos, target) )
             break 
     if pt_origin is None or commitId is None: 
@@ -74,10 +74,11 @@ def run(client, server_transport, keyword):
         all_pts = []
         count = 0
         all_geom = []
-        for bld in objects:
+        for i, bld in enumerate(objects):
             # get all intersection points 
             meshes = getAllPlanes(bld)
             for mesh in meshes:
+                if len(mesh)<3: continue 
                 all_geom.append(mesh)
                 pts, usedVectors = projectToPolygon(pt_origin, vectors, usedVectors, mesh, count) #Mesh.create(vertices = [0,0,0,5,0,0,5,19,0,0,14,0], faces=[4,0,1,2,3]))
                 all_pts.extend(pts)
@@ -151,11 +152,18 @@ def run(client, server_transport, keyword):
                 source_application="Python",
             )
 
+r'''
+# FOE DEBUGGING LOCALLY run this file
+from specklepy.transports.server import ServerTransport
+from specklepy.api.client import SpeckleClient
+from specklepy.api.credentials import get_local_accounts
 
-#KEYWORD = "window"
-#server_url = "https://latest.speckle.dev/" #"https://speckle.xyz/" # project_data.speckle_server_url
-#project_id = "04a609b47c" #"4ea6a03993"# Kate's tests #"17b0b76d13" #project_data.project_id
-#account = get_local_accounts()[0]
-#client = SpeckleClient(server_url)
-#client.authenticate_with_token(account.token)
-#server_transport = ServerTransport(project_id, client)
+KEYWORD = "window"
+server_url = "https://latest.speckle.dev/" #"https://speckle.xyz/" # project_data.speckle_server_url
+project_id = "4ea6a03993" #"4ea6a03993"# Kate's tests #"17b0b76d13" #project_data.project_id
+account = get_local_accounts()[0]
+client = SpeckleClient(server_url)
+client.authenticate_with_token(account.token)
+server_transport = ServerTransport(project_id, client)
+run(client, server_transport, KEYWORD) 
+'''
