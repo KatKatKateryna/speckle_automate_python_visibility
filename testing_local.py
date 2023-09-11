@@ -71,6 +71,7 @@ def run(client, server_transport, keyword):
     ###########################
     else:
         usedVectors = {}
+        meshes_exclude = []
         all_pts = []
         count = 0
         all_geom = []
@@ -80,7 +81,7 @@ def run(client, server_transport, keyword):
             for mesh in meshes:
                 if len(mesh)<3: continue 
                 all_geom.append(mesh)
-                pts, usedVectors = projectToPolygon(pt_origin, vectors, usedVectors, mesh, count) #Mesh.create(vertices = [0,0,0,5,0,0,5,19,0,0,14,0], faces=[4,0,1,2,3]))
+                pts, usedVectors, meshes_exclude = projectToPolygon(pt_origin, vectors, usedVectors, mesh, count, meshes_exclude) #Mesh.create(vertices = [0,0,0,5,0,0,5,19,0,0,14,0], faces=[4,0,1,2,3]))
                 all_pts.extend(pts)
                 count +=1
 
@@ -89,14 +90,14 @@ def run(client, server_transport, keyword):
         ### expand number of pts around filtered rays 
         expandedPts2 = []
         mesh_nearby = findMeshesNearby(cleanPts)
-        expandedPts21, usedVectors2 = expandPtsList(pt_origin, cleanPts, {}, STEP_DEGREES_EXTENSION, all_geom, mesh_nearby)
+        expandedPts21, usedVectors2 = expandPtsList(pt_origin, cleanPts, {}, STEP_DEGREES_EXTENSION, all_geom, mesh_nearby, meshes_exclude)
         expandedPts2 = cleanPtsList(pt_origin, expandedPts21, usedVectors2)
 
         ### expand number of pts around filtered rays 
         expandedPts3 = []
         clean_extended_pts = cleanPts + expandedPts2
         mesh_nearby = findMeshesNearby(clean_extended_pts)
-        expandedPts31, usedVectors3 = expandPtsList(pt_origin, clean_extended_pts, {}, STEP_DEGREES_EXTENSION/3, all_geom, mesh_nearby)
+        expandedPts31, usedVectors3 = expandPtsList(pt_origin, clean_extended_pts, {}, STEP_DEGREES_EXTENSION/3, all_geom, mesh_nearby, meshes_exclude)
         expandedPts3 = cleanPtsList(pt_origin, expandedPts31, usedVectors3)
 
         ### expand number of pts around filtered rays 

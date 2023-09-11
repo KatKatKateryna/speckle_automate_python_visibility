@@ -102,8 +102,9 @@ def getAllPlanes(mesh: Mesh) -> List[list]:
             meshList.extend(getAllPlanes(m))
     return meshList
     
-def projectToPolygon(point: List[float], vectors: List[List[float]], usedVectors: dict, m, index, vectors_indices = None):
+def projectToPolygon(point: List[float], vectors: List[List[float]], usedVectors: dict, m, index, meshes_exclude, vectors_indices = None):
     allIntersections = []
+    #meshes_exclude = []
 
     #meshes = getAllPlanes(mesh)
     #for x, m in enumerate(meshes): 
@@ -132,6 +133,7 @@ def projectToPolygon(point: List[float], vectors: List[List[float]], usedVectors
         if (compare1>=0 and compare2>=0 and compare3>=0): # or (compare1<0 and compare2<0 and compare3<0) : 
             pass 
         else:
+            meshes_exclude.append(index)
             continue # if different direction 
 
         result = containsPoint(collision, m)
@@ -161,10 +163,10 @@ def projectToPolygon(point: List[float], vectors: List[List[float]], usedVectors
             else:
                 usedVectors.update({i:val})
 
-    return allIntersections, usedVectors
+    return allIntersections, usedVectors, meshes_exclude
 
 
-def expandPtsList(pt_origin, all_pts, usedVectors, step_original, all_geom, mesh_nearby):
+def expandPtsList(pt_origin, all_pts, usedVectors, step_original, all_geom, mesh_nearby, meshes_exclude):
 
     new_pts = []
     #
@@ -198,10 +200,12 @@ def expandPtsList(pt_origin, all_pts, usedVectors, step_original, all_geom, mesh
     # project rays 
     count = 0
     for mesh in all_geom:
+        if count in meshes_exclude: continue 
+        
         vectors_to_mesh = [ v for x,v in enumerate(vectors) if vectors_mesh_ids[x]==count ]
         vectors_to_mesh_enum = [ x for x,v in enumerate(vectors) if vectors_mesh_ids[x]==count ]
         #if count in ([ptSpeckle.meshId] + mesh_nearby[i]):  
-        pts, usedVectorsUpd = projectToPolygon(pt_origin, vectors_to_mesh, {}, mesh, count, vectors_to_mesh_enum) #Mesh.create(vertices = [0,0,0,5,0,0,5,19,0,0,14,0], faces=[4,0,1,2,3]))
+        pts, usedVectorsUpd, meshes_exclude = projectToPolygon(pt_origin, vectors_to_mesh, {}, mesh, count, meshes_exclude, vectors_to_mesh_enum) #Mesh.create(vertices = [0,0,0,5,0,0,5,19,0,0,14,0], faces=[4,0,1,2,3]))
         new_pts.extend( pts )
         for k, v in usedVectorsUpd.items():
             try: val = usedVectors[k] + 1
